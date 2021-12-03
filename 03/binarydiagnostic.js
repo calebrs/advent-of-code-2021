@@ -53,6 +53,8 @@ function swapRowsAndColumns(arr) {
   });
 }
 
+// first star
+
 function getMostCommonBit(arr) {
   let one = 0;
   let zero = 0;
@@ -67,7 +69,7 @@ function getMostCommonBit(arr) {
 
   if (one > zero) {
     return 1;
-  } else {
+  } else if (zero > one) {
     return 0;
   }
 }
@@ -82,7 +84,7 @@ function getLeastCommon(arr) {
   })
 }
 
-function getPowerConsumption(data) {
+function getGammaAndEpsilon(data) {
   const swappedRows = swapRowsAndColumns(data);
 
   const mostCommon = swappedRows.map(arr => {
@@ -91,17 +93,113 @@ function getPowerConsumption(data) {
 
   const leastCommon = getLeastCommon(mostCommon);
 
-  const gammaRate = parseInt(mostCommon.join(''), 2);
-  const epsilonRate = parseInt(leastCommon.join(''), 2);
+  const gammaRate = mostCommon.join('');
+  const epsilonRate = leastCommon.join('');
 
-  return gammaRate * epsilonRate;
-
+  return {gammaRate, epsilonRate};
 }
 
-let dataAsArray = getDataFromText(path);
-console.log(swapRowsAndColumns(testData));
-console.log(getPowerConsumption(testData));
-console.log(getPowerConsumption(dataAsArray));
+function getPowerConsumption(data) {
+  const rates = getGammaAndEpsilon(data);
+
+  return parseInt(rates.gammaRate, 2) * parseInt(rates.epsilonRate, 2);
+}
+
+// second star
+/*
+Problem: 
+input: an array of binary numbers
+output: the oxygen and co2 ratings
+oxygen: most common value in the bit position, keep only those numbers. when one number is left stop
+co2: same but with least common value
+
+exmaple: SEE CODE
+
+algorithm:
+declare length
+
+iterate number of bits times declare index
+  declare the index
+  iterate through all the binaries
+    tally ones and zeros
+    if 1 is greater, filter the binaries
+    if 0 is greater, filter the binaries
+    if they're equal, keep the 0s
+
+
+
+*/
+
+function getOxygen(data) {
+  let binaryLength = data[0].length;
+
+  for (let indx = 0; indx < binaryLength; indx += 1) {
+    let ones = 0;
+    let zeros = 0;
+
+    data.forEach(binary => {
+      if (binary[indx] === '1') {
+        ones += 1;
+      } else if (binary[indx] === '0') {
+        zeros += 1;
+      }
+    });
+
+    if (zeros > ones) {
+      data = data.filter(binary => binary[indx] === '0');
+    } else {
+      data = data.filter(binary => binary[indx] === '1');
+    }
+    
+    if (data.length === 1) break;
+  }
+
+  return parseInt(data[0], 2);
+}
+
+function getCo2(data) {
+  let binaryLength = data[0].length;
+
+  for (let indx = 0; indx < binaryLength; indx += 1) {
+    let ones = 0;
+    let zeros = 0;
+
+    data.forEach(binary => {
+      if (binary[indx] === '1') {
+        ones += 1;
+      } else if (binary[indx] === '0') {
+        zeros += 1;
+      }
+    });
+
+    if (zeros <= ones) {
+      data = data.filter(binary => binary[indx] === '0');
+    } else {
+      data = data.filter(binary => binary[indx] === '1');
+    }
+    
+    if (data.length === 1) break;
+  }
+
+  return parseInt(data[0], 2);
+}
+
+function getLifeSupportRating(data) {
+  const oxygen = getOxygen(data);
+  const co2 = getCo2(data);
+
+  console.log(oxygen);
+  console.log(co2);
+  return oxygen * co2;
+}
+
+
+// console.log(getPowerConsumption(testData));
+// console.log(getPowerConsumption(dataAsArray));
+const dataAsArray = getDataFromText(path);
+console.log(getLifeSupportRating(testData)); // 230
+console.log(getLifeSupportRating(dataAsArray))
+
 
 
 
